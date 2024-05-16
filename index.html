@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Phone Auth</title>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_CR2iFMPuJwRUaUFPFO26bUfNXW5zZiQ",
+      authDomain: "phoneauthproject-59cbc.firebaseapp.com",
+      projectId: "phoneauthproject-59cbc",
+      storageBucket: "phoneauthproject-59cbc.appspot.com",
+      messagingSenderId: "173020423799",
+      appId: "1:173020423799:web:df85b5fb54a6c294290872"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Set up reCAPTCHA verifier
+    window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        console.log("reCAPTCHA verified.");
+      }
+    }, auth);
+  </script>
+</head>
+<body>
+  <h1>Login with Phone Number</h1>
+  <input type="text" id="phone-number" placeholder="Enter phone number">
+  <button id="sign-in-button">Send OTP</button>
+  <div id="recaptcha-container"></div>
+
+  <script type="module">
+    import { getAuth, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const auth = getAuth();
+
+    document.getElementById('sign-in-button').addEventListener('click', () => {
+      const phoneNumber = document.getElementById('phone-number').value;
+      const appVerifier = window.recaptchaVerifier;
+
+      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        .then(confirmationResult => {
+          const otp = prompt('Enter the OTP you received');
+          return confirmationResult.confirm(otp);
+        })
+        .then(result => {
+          console.log('User signed in successfully:', result.user);
+        })
+        .catch(error => {
+          console.error('Error during sign-in:', error);
+        });
+    });
+  </script>
+</body>
+</html>
